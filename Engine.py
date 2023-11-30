@@ -38,7 +38,10 @@ class Engine:
             if event.type == pygame.QUIT:
                 Engine.running = False
         Engine.board.update()
-
+        if Engine.board.gameOver():
+            Engine.snek = Snek(Engine.surface, \
+                               int((Engine.WIDTH / 2) / 16) * 16, int((Engine.HEIGHT / 2) / 16) * 16)
+            Engine.board = Board(Engine.snek, Engine.surface, Engine.WIDTH, Engine.HEIGHT)
 
     def __render():
         Engine.surface.fill((0, 0, 0))
