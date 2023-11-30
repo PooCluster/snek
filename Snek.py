@@ -2,25 +2,28 @@ import pygame
 from enum import Enum
 
 class Snek:
+    # constant
+    DEFAULT_LENGTH = 3
+
     class Direction(Enum):
         UP    = 0
         DOWN  = 1
         LEFT  = 2
         RIGHT = 3
 
-    class SnekNode:
-        def __init__(self, x, y):
-            self.x = x
-            self.y = y
-
     def __init__(self, surface, x = -1, y = -1):
-        self.chain = [                \
-            Snek.SnekNode(x, y),      \
-            Snek.SnekNode(x + 16, y), \
-            Snek.SnekNode(x + 32, y)  \
-        ]
+        self.chain = []
+        for i in range(Snek.DEFAULT_LENGTH):
+            self.chain.append((x + (i * 16), y))
         self.surface = surface
         self.direction = Snek.Direction.LEFT
+        self.eating = False
+
+    def getHead(self):
+        return (self.chain[0][0], self.chain[0][1])
+
+    def eat(self):
+        self.eating = True
 
     def update(self):
         # read direction
@@ -47,10 +50,13 @@ class Snek:
             xChange += 16
 
         # move head to new location
-        self.chain.insert(0, Snek.SnekNode(self.chain[0].x + xChange, self.chain[0].y + yChange))
-        # remove tail
-        self.chain.pop()
+        self.chain.insert(0, (self.chain[0][0] + xChange, self.chain[0][1] + yChange))
+        # eat or remove tail
+        if self.eating:
+            self.eating = False
+        else:
+            self.chain.pop()
 
     def render(self):
         for snekNode in self.chain:
-            pygame.draw.rect(self.surface, (0, 255, 0, 255), pygame.Rect(snekNode.x, snekNode.y, 16, 16))
+            pygame.draw.rect(self.surface, (0, 255, 0, 255), pygame.Rect(snekNode[0], snekNode[1], 16, 16))
