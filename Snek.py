@@ -18,6 +18,7 @@ class Snek:
         self.surface = surface
         self.direction = Snek.Direction.LEFT
         self.eating = False
+        self.dead = False
 
     def getHead(self):
         return (self.chain[0][0], self.chain[0][1])
@@ -25,7 +26,20 @@ class Snek:
     def eat(self):
         self.eating = True
 
+    def kill(self):
+        self.dead = True
+
+    def isDead(self):
+        return self.dead
+
+    def posInChain(self, pos):
+        return pos in self.chain
+
     def update(self):
+        # we good?
+        if self.dead:
+            return
+
         # read direction
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP] and not self.direction == Snek.Direction.DOWN:
@@ -50,7 +64,11 @@ class Snek:
             xChange += 16
 
         # move head to new location
-        self.chain.insert(0, (self.chain[0][0] + xChange, self.chain[0][1] + yChange))
+        newPos = (self.chain[0][0] + xChange, self.chain[0][1] + yChange)
+        if self.posInChain(newPos):
+            self.kill()
+        self.chain.insert(0, newPos)
+
         # eat or remove tail
         if self.eating:
             self.eating = False
